@@ -85,13 +85,19 @@ RSpec.describe StatTracker do
 
     describe '#count_of_teams' do
       it "Returns the number of unique teams in the data" do
-        expect(stat_tracker.count_of_teams).to eq(33)
+        expect(stat_tracker.count_of_teams).to eq(32)
       end
     end
 
     describe '#best_offense' do
       it "Name of the team with the highest average number of goals scored per game across all seasons" do
         expect(stat_tracker.best_offense).to eq('Reign FC')
+      end
+    end
+
+    describe '#winningest_coach' do
+      it "Name of the coach  with the highest win percentage for a given season" do
+        expect(stat_tracker.winningest_coach("20132014")).to eq('Reign FC')
       end
     end
 
