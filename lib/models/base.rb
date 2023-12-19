@@ -10,7 +10,8 @@ class BaseModel
                            :group, 
                            :average, 
                            :maximum, 
-                           :minimum
+                           :minimum,
+                           :percent
   end
 
   def self.load(file_location)

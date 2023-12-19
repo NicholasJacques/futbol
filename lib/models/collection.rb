@@ -9,6 +9,7 @@ class Collection
       .lazy
       .map {|r| klass.new(r)}
     @grouped_value = nil
+    @wheres = []
   end
 
   def all
@@ -17,6 +18,10 @@ class Collection
 
   def group(field)
     clone.tap {|c| c.grouped_value = field}
+  end
+
+  def where[]
+    @wheres << 
   end
 
   def average(field, round=0)
@@ -62,6 +67,32 @@ class Collection
 
   def minimum(field)
     self.min_by {|obj| obj.send(field) }.send(field)
+  end
+
+  def percent(field, value: true, operator: '&', round: 0)
+    if grouped_value
+      keys = Hash.new { |hash, key| hash[key] = { denominator: 0, numerator: 0 } }
+      self.reduce(keys) do |keys, obj|
+          keys[obj.send(grouped_value)][:denominator] += 1
+          if value.send(operator, obj.send(field))
+          #if obj.send(field).send(operator, value)
+            keys[obj.send(grouped_value)][:numerator] += 1
+          end
+          keys
+      end
+      keys.transform_values {|v| (v[:numerator] / v[:denominator].to_f).round(round) }
+    else
+      numerator = 0
+      denominator = 0.to_f
+      self.each do |obj|
+        denominator += 1
+        if value.send(operator, obj.send(field))
+          numerator += 1
+        end
+        
+      end
+      (numerator / denominator).round(round)
+    end
   end
 
   def find(id)

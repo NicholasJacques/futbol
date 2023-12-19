@@ -26,42 +26,15 @@ class StatTracker
     end
 
     def percentage_home_wins
-        total_count = 0
-        win_count = 0
-        Game.all.each do |game|
-            total_count += 1
-            if game.home_win?
-                win_count += 1
-            end
-        end
-
-        (win_count / total_count.to_f).round(2)
+        Game.percent(:home_win?, round: 2)
     end
 
     def percentage_visitor_wins
-        total_count = 0
-        win_count = 0
-        Game.all.each do |game|
-            total_count += 1
-            if game.away_win?
-                win_count += 1
-            end
-        end
-
-        (win_count / total_count.to_f).round(2)
+        Game.percent(:away_win?, round: 2)
     end
 
     def percentage_ties
-        total_count = 0
-        tie_count = 0
-        Game.all.each do |game|
-            total_count += 1
-            if game.tie?
-                tie_count += 1
-            end
-        end
-
-        (tie_count / total_count.to_f).round(2)
+        Game.percent(:tie?, round: 2)
     end
     
     def count_of_games_by_season
@@ -132,8 +105,9 @@ class StatTracker
 
     def winningest_coach(season_id)
         GameTeam.group(:coach)
-            .where(season_id: 'WIN')
-            .min_by { |k, v| v }[0]
+            .where(season_id: season_id)
+            .percentage(:result, '==', 'WIN', 2)
+            .max_by { |k, v| v }[0]
     end
 
     def worst_coach(season_id)
